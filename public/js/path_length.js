@@ -162,13 +162,44 @@ function drawPath(path, half) {
         }
         contextX += width / 2;
 
-        context.arc(
-          contextX,
-          contextY,
-          Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
-          0.25 * Math.PI,
-          1.25 * Math.PI
-        );
+        if (half === "top") {
+          if (ends === "center") {
+            context.arc(
+              contextX,
+              contextY,
+              Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
+              0.25 * Math.PI,
+              1.25 * Math.PI
+            );
+          } else {
+            context.arc(
+              contextX,
+              contextY,
+              Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
+              0.75 * Math.PI,
+              1.75 * Math.PI
+            );
+          }
+        } else {
+          if (ends === "center") {
+            context.arc(
+              contextX,
+              contextY,
+              Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
+              0.75 * Math.PI,
+              1.75 * Math.PI
+            );
+          } else {
+            context.arc(
+              contextX,
+              contextY,
+              Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
+              0.25 * Math.PI,
+              1.25 * Math.PI
+            );
+          }
+        }
+
         context.stroke();
         contextX += width / 2;
         if (ends === "center") {
