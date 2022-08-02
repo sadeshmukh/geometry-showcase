@@ -107,11 +107,11 @@ function onSidesSubmit(event = false) {
     // Create coordinates for points of triangle (yoinked from stackoverflow)
     const pointA = [0, 0];
     const pointB = [0, sideBVal];
-    const pointC = [];
-    pointC[1] =
-      (sideBVal * sideBVal + sideAVal * sideAVal - sideCVal * sideCVal) /
-      (2 * sideBVal);
-    pointC[0] = Math.sqrt(sideAVal ** 2 - pointC[1] ** 2);
+    const pointC = [sideAVal, 0];
+    // pointC[1] =
+    //   (sideBVal * sideBVal + sideAVal * sideAVal - sideCVal * sideCVal) /
+    //   (2 * sideBVal);
+    // pointC[0] = Math.sqrt(sideAVal ** 2 - pointC[1] ** 2);
     // Draw
 
     context.clearRect(0, 0, initialWidth, initialHeight);
@@ -133,10 +133,7 @@ function onSidesSubmit(event = false) {
       pointC[1] + (initialHeight - sideBVal) / 2
     );
     // Draws line back to original
-    context.lineTo(
-      pointA[0] + (initialWidth - sideAVal) / 2,
-      pointA[1] + (initialHeight - sideBVal) / 2
-    );
+    context.closePath();
     context.stroke();
   }
   // Round values
