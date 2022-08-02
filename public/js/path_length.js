@@ -10,6 +10,25 @@ let path2;
 
 const possibleLines = ["straight", "corner", "semicircle"];
 
+// Preset
+const arrowHeartPathTop = [
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 0 },
+  { width: 200, type: "corner", begins: "outer", ends: "center", index: 1 },
+  { width: 200, type: "semicircle", begins: "center", ends: "outer", index: 2 },
+  { width: 200, type: "semicircle", begins: "outer", ends: "center", index: 3 },
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 4 },
+  { width: 200, type: "corner", begins: "outer", ends: "center", index: 4 },
+];
+
+const arrowHeartPathBottom = [
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 0 },
+  { width: 200, type: "corner", begins: "outer", ends: "center", index: 1 },
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 2 },
+  { width: 200, type: "straight", begins: "outer", ends: "center", index: 3 },
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 4 },
+  { width: 200, type: "corner", begins: "outer", ends: "center", index: 4 },
+];
+
 // Canvas
 
 const lineColors = [
@@ -99,12 +118,12 @@ function drawPath(path, half) {
 
     context.fillStyle = currentColor;
     context.strokeStyle = currentColor;
-    console.log(
-      initialHeight / 2 - contextY,
-      initialHeight / 2,
-      pathHeight,
-      half
-    );
+    // console.log(
+    //   initialHeight / 2 - contextY,
+    //   initialHeight / 2,
+    //   pathHeight,
+    //   half
+    // );
     switch (type) {
       case "straight":
         context.moveTo(contextX, contextY);
@@ -161,41 +180,48 @@ function drawPath(path, half) {
           contextY = initialHeight / 2 + pathHeight / 2 + pathGap;
         }
         contextX += width / 2;
+        let angle;
+
+        console.log(angle);
 
         if (half === "top") {
           if (ends === "center") {
+            angle = (1 / 2) * Math.PI - Math.atan(width / pathHeight);
             context.arc(
               contextX,
               contextY,
-              Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
-              0.25 * Math.PI,
-              1.25 * Math.PI
+              Math.sqrt(width ** 2.0 + pathHeight ** 2.0) / 2.0,
+              angle + 1 * Math.PI,
+              angle + 0 * Math.PI
             );
           } else {
+            angle = (1 / 2) * Math.PI - Math.atan(pathHeight / width);
             context.arc(
               contextX,
               contextY,
               Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
-              0.75 * Math.PI,
-              1.75 * Math.PI
+              angle + 0.5 * Math.PI,
+              angle + 1.5 * Math.PI
             );
           }
         } else {
           if (ends === "center") {
+            angle = (1 / 2) * Math.PI - Math.atan(pathHeight / width);
             context.arc(
               contextX,
               contextY,
               Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
-              0.75 * Math.PI,
-              1.75 * Math.PI
+              angle + 1.5 * Math.PI,
+              angle + 0.5 * Math.PI
             );
           } else {
+            angle = (1 / 2) * Math.PI - Math.atan(width / pathHeight);
             context.arc(
               contextX,
               contextY,
               Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
-              0.25 * Math.PI,
-              1.25 * Math.PI
+              angle + 0 * Math.PI,
+              angle + 1 * Math.PI
             );
           }
         }
@@ -239,6 +265,14 @@ function reset() {
   //   if (JSON.encode(path1) === JSON.encode(path2)) {
   //     alert("That's kinda cool");
   //   }
+}
+
+function heartReset() {
+  context.clearRect(0, 0, initialWidth, initialWidth);
+  path1 = [...arrowHeartPathTop];
+  path2 = [...arrowHeartPathBottom];
+  drawPath(path1, "top");
+  drawPath(path2, "bottom");
 }
 
 reset();
