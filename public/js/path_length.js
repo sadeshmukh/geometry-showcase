@@ -43,14 +43,14 @@ function generatePath(pathLength, presetWidths = null) {
   // Each object is structured: {width: 1234, type: "corner"}
   // The height is a constant
   let path = [];
-  let lastEnd = "bottom";
+  let lastEnd = "center";
   for (let i = 0; i < pathLength; i++) {
     // Generate one
     let end;
-    if (lastEnd === "bottom") {
-      end = "top";
+    if (lastEnd === "center") {
+      end = "outer";
     } else {
-      end = "bottom";
+      end = "center";
     }
     // Even widths
     let objectWidth;
@@ -97,7 +97,7 @@ function drawPath(path, half) {
     context.strokeStyle = currentColor;
     switch (type) {
       case "straight":
-        if (ends === "bottom") {
+        if (ends === "center") {
           if (half === "top") {
             contextY = initialHeight / 2 - pathGap;
           } else {
@@ -121,7 +121,7 @@ function drawPath(path, half) {
 
         break;
       case "corner":
-        if (ends === "bottom") {
+        if (ends === "center") {
           if (half === "top") {
             contextY = initialHeight / 2 - pathGap;
           } else {
