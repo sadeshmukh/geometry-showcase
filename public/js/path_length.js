@@ -1,16 +1,16 @@
 const startButton = document.getElementById("startButton");
 const pathContainer = document.getElementById("pathContainer");
 const pathHeight = 150;
-const pathMinWidth = 100;
-const pathMaxWidth = 300;
 const pathSegments = 6;
 const pathGap = 20 / 2;
 
-const possibleLines = [
-  "straight",
-  "corner",
-  // "semicircle"
-];
+let path1;
+let path1Widths;
+let path2;
+
+const possibleLines = ["straight", "corner", "semicircle"];
+
+// Canvas
 
 const lineColors = [
   "#dc3545",
@@ -21,7 +21,6 @@ const lineColors = [
   "#6610f2",
 ];
 
-// Canvas
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
@@ -32,6 +31,8 @@ context.canvas.width = initialWidth;
 context.canvas.height = initialHeight;
 
 context.lineWidth = 5;
+const fullPathMinWidth = (initialWidth / 5) * 3;
+const fullPathMaxWidth = (initialWidth / 7) * 6;
 
 function roundedRandomNumber(min, max) {
   let retval = Math.floor(Math.random() * (max - min + 1) + min + 1) - 1;
@@ -57,7 +58,11 @@ function generatePath(pathLength, presetWidths = null) {
     if (presetWidths) {
       objectWidth = presetWidths[i];
     } else {
-      objectWidth = roundedRandomNumber(pathMinWidth / 2, pathMaxWidth / 2) * 2;
+      objectWidth =
+        roundedRandomNumber(
+          fullPathMinWidth / pathLength / 2,
+          fullPathMaxWidth / pathLength / 2
+        ) * 2;
     }
     let pathObject = {
       width: objectWidth,
@@ -68,8 +73,8 @@ function generatePath(pathLength, presetWidths = null) {
     };
     lastEnd = end;
     path.push(pathObject);
-    console.log(pathObject);
   }
+
   return path;
 }
 
@@ -88,15 +93,22 @@ function drawPath(path, half) {
   } else {
     contextY = initialHeight / 2 + pathGap;
   }
-  context.moveTo(contextX, contextY);
 
   path.forEach(({ width, type, begins, ends, index }) => {
     let currentColor = lineColors[index % lineColors.length];
 
     context.fillStyle = currentColor;
     context.strokeStyle = currentColor;
+    console.log(
+      initialHeight / 2 - contextY,
+      initialHeight / 2,
+      pathHeight,
+      half
+    );
     switch (type) {
       case "straight":
+        context.moveTo(contextX, contextY);
+
         if (ends === "center") {
           if (half === "top") {
             contextY = initialHeight / 2 - pathGap;
@@ -114,13 +126,12 @@ function drawPath(path, half) {
         contextX += width;
 
         context.lineTo(contextX, contextY);
-        context.closePath();
         context.stroke();
-        context.beginPath();
-        context.moveTo(contextX, contextY);
 
         break;
       case "corner":
+        context.moveTo(contextX, contextY);
+
         if (ends === "center") {
           if (half === "top") {
             contextY = initialHeight / 2 - pathGap;
@@ -142,30 +153,61 @@ function drawPath(path, half) {
         context.lineTo(contextX, contextY);
         context.stroke();
 
-        context.closePath();
-
-        context.beginPath();
-        context.moveTo(contextX, contextY);
-
         break;
       case "semicircle":
+        if (half === "top") {
+          contextY = initialHeight / 2 - pathHeight / 2 - pathGap;
+        } else {
+          contextY = initialHeight / 2 + pathHeight / 2 + pathGap;
+        }
+        contextX += width / 2;
+
+        context.arc(
+          contextX,
+          contextY,
+          Math.sqrt(width ** 2 + pathHeight ** 2) / 2,
+          0.25 * Math.PI,
+          1.25 * Math.PI
+        );
+        context.stroke();
+        contextX += width / 2;
+        if (ends === "center") {
+          if (half === "top") {
+            contextY = initialHeight / 2 - pathGap;
+          } else {
+            contextY = initialHeight / 2 + pathGap;
+          }
+        } else {
+          if (half === "top") {
+            contextY = initialHeight / 2 - pathHeight - pathGap;
+          } else {
+            contextY = initialHeight / 2 + pathHeight + pathGap;
+          }
+        }
+
         break;
       default:
         console.error("Impossible type for path section");
     }
+
+    context.beginPath();
   });
 }
 
 function reset() {
   context.clearRect(0, 0, initialWidth, initialWidth);
-  let path1 = generatePath(pathSegments);
-  let path1Widths = [];
+  path1 = generatePath(pathSegments);
+  path1Widths = [];
   path1.map(({ width }) => {
     path1Widths.push(width);
   });
-  let path2 = generatePath(pathSegments, path1Widths);
+  path2 = generatePath(pathSegments, path1Widths);
+
   drawPath(path1, "top");
   drawPath(path2, "bottom");
+  //   if (JSON.encode(path1) === JSON.encode(path2)) {
+  //     alert("That's kinda cool");
+  //   }
 }
 
 reset();
