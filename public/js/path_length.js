@@ -21,7 +21,7 @@ const correctAnswerDetails = document.getElementById("correctAnswerDetails");
 
 let showWidths = false;
 
-const possibleLines = ["straight", "corner", "semicircle"];
+const possibleLines = ["straight", "corner"];
 // const possibleLines = ["corner"];
 
 // Preset
@@ -78,6 +78,18 @@ let fontLineWidth = 1;
 context.font = "20px 'Nunito'";
 const fullPathMinWidth = (initialWidth / 5) * 3;
 const fullPathMaxWidth = (initialWidth / 7) * 6;
+
+let start = { top: undefined, bottom: undefined };
+// Pixels/second
+const traceSpeed = 200;
+const tracerWidth = 10;
+
+let tracerPos = { top: [0, 0], bottom: [0, 0] };
+
+let tracerDone = false;
+let tracerHiddden = false;
+
+const tracePathButton = document.getElementById("tracePathsButton");
 
 function roundedRandomNumber(min, max) {
   let retval = Math.floor(Math.random() * (max - min + 1) + min + 1) - 1;
@@ -321,6 +333,211 @@ function drawPath(path, half) {
   });
 }
 
+function drawTracer(
+  path,
+  currentSection,
+  fractionThrough,
+  half,
+  distanceThrough
+) {
+  switch (path[currentSection].type) {
+    case "straight":
+      // tracerPos[half][0] =
+      //   tracerPos[half][0] + fractionThrough * path[currentSection].width;
+      tracerPos[half][0] += fractionThrough * path[currentSection].width;
+      if (half === "bottom") {
+        // console.log(tracerPos[half], "before");
+      }
+      if (path[currentSection].ends === "center") {
+        if (half === "top") {
+          tracerPos[half][1] += fractionThrough * pathHeight;
+        } else {
+          console.log("this is bottom");
+          tracerPos[half][1] -= fractionThrough * pathHeight;
+        }
+      } else {
+        if (half === "top") {
+          tracerPos[half][1] -= fractionThrough * pathHeight;
+        } else {
+          console.log("this is bottom");
+          tracerPos[half][1] += fractionThrough * pathHeight;
+        }
+      }
+      if (half === "bottom") {
+        // console.log(tracerPos[half], "after");
+      }
+      context.moveTo(tracerPos[half][0], tracerPos[half][1] - tracerWidth / 2);
+      context.lineTo(tracerPos[half][0], tracerPos[half][1] + tracerWidth / 2);
+      Math.sqrt(path[currentSection].width ** 2 + pathHeight ** 2);
+      break;
+    case "corner":
+      if (
+        fractionThrough <
+        pathHeight / (pathHeight + path[currentSection].width)
+      ) {
+        // Drawing the vertical
+
+        if (path[currentSection].ends === "outer") {
+          if (half === "top") {
+            tracerPos[half][1] -= distanceThrough;
+          } else {
+            tracerPos[half][1] += distanceThrough;
+          }
+        } else {
+          if (half === "top") {
+            tracerPos[half][1] += distanceThrough;
+          } else {
+            tracerPos[half][1] -= distanceThrough;
+          }
+        }
+      } else {
+        if (path[currentSection].ends === "outer") {
+          if (half === "top") {
+            tracerPos[half][1] -= pathHeight;
+          } else {
+            tracerPos[half][1] += pathHeight;
+          }
+        } else {
+          if (half === "top") {
+            tracerPos[half][1] += pathHeight;
+          } else {
+            tracerPos[half][1] -= pathHeight;
+          }
+        }
+
+        tracerPos[half][0] += distanceThrough - pathHeight;
+      }
+
+      context.moveTo(tracerPos[half][0], tracerPos[half][1] - tracerWidth / 2);
+      context.lineTo(tracerPos[half][0], tracerPos[half][1] + tracerWidth / 2);
+    case "semicircle":
+      // x: cos(angle) * radius
+      // y: sin(angle) * radius
+      // angle is = arc
+      break;
+    default:
+      break;
+  }
+}
+
+// Traces paths individually
+function tracePath(timestamp, path, half, currentSection, distanceThrough) {
+  // redraw();
+  if (tracerDone) {
+    return;
+  }
+  let fullPathWidth = 0;
+  path.forEach(({ width }) => {
+    fullPathWidth += width;
+  });
+  if (!currentSection) {
+    currentSection = 0;
+    if (path[currentSection].ends === "outer") {
+      if (half === "top") {
+        tracerPos[half][1] = initialHeight / 2 - pathGap;
+      } else {
+        tracerPos[half][1] = initialHeight / 2 + pathGap;
+      }
+    } else {
+      if (half === "top") {
+        tracerPos[half][1] = initialHeight / 2 - pathGap - pathHeight;
+      } else {
+        tracerPos[half][1] = initialHeight / 2 + pathGap + pathHeight;
+      }
+    }
+    tracerPos[half][0] = (initialWidth - fullPathWidth) / 2;
+  }
+  if (!distanceThrough) {
+    distanceThrough = 0;
+  }
+  // Loops over path
+  if (start[half] === undefined) {
+    start[half] = timestamp;
+  }
+  const elapsedSeconds = (timestamp - start[half]) / 1000;
+
+  distanceThrough += traceSpeed * elapsedSeconds;
+
+  let currentSectionPathLength = calculatePathLength([path[currentSection]]);
+  if (distanceThrough >= currentSectionPathLength) {
+    if (currentSection + 1 >= path.length) {
+      tracerDone = true;
+      start = { top: undefined, bottom: undefined };
+      tracerPos = { top: [0, 0], bottom: [0, 0] };
+      resetTracePaths();
+      drawTracer(
+        path,
+        currentSection,
+        distanceThrough / calculatePathLength([path[currentSection]]),
+        half,
+        distanceThrough
+      );
+
+      return;
+    }
+    currentSection += 1;
+    console.log("next section");
+    distanceThrough -= currentSectionPathLength;
+    if (path[currentSection].ends === "outer") {
+      if (half === "top") {
+        tracerPos[half][1] = initialHeight / 2 - pathGap;
+      } else {
+        tracerPos[half][1] = initialHeight / 2 + pathGap;
+      }
+    } else {
+      if (half === "top") {
+        tracerPos[half][1] = initialHeight / 2 - pathGap - pathHeight;
+      } else {
+        tracerPos[half][1] = initialHeight / 2 + pathGap + pathHeight;
+      }
+    }
+    tracerPos[half][0] = (initialWidth - fullPathWidth) / 2;
+
+    for (i = 0; i < currentSection; i++) {
+      tracerPos[half][0] += path[i].width;
+    }
+  }
+  const fractionThrough =
+    distanceThrough / calculatePathLength([path[currentSection]]);
+  // Actually draw the progress
+  if (currentSection === 0 && distanceThrough === 0) {
+    tracerPos[half][0] = (initialWidth - fullPathWidth) / 2;
+  }
+  context.beginPath();
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = tracerWidth;
+  if (half === "bottom") {
+    drawTracer(path, currentSection, fractionThrough, half, distanceThrough);
+  } else {
+    drawTracer(path, currentSection, fractionThrough, half, distanceThrough);
+  }
+
+  context.stroke();
+  // Reset tracerX/tracerY
+  tracerPos[half][0] = (initialWidth - fullPathWidth) / 2;
+  for (i = 0; i < currentSection; i++) {
+    tracerPos[half][0] += path[i].width;
+  }
+  if (half === "top") {
+    if (path[currentSection].ends === "outer") {
+      tracerPos[half][1] = initialHeight / 2 - pathGap;
+    } else {
+      tracerPos[half][1] = initialHeight / 2 - pathGap - pathHeight;
+    }
+  } else {
+    if (path[currentSection].ends === "outer") {
+      tracerPos[half][1] = initialHeight / 2 + pathGap;
+    } else {
+      tracerPos[half][1] = initialHeight / 2 + pathGap + pathHeight;
+    }
+  }
+  context.lineWidth = defaultLineWidth;
+  start[half] = timestamp;
+  window.requestAnimationFrame((newTimestamp) =>
+    tracePath(newTimestamp, path, half, currentSection, distanceThrough)
+  );
+}
+
 function calculatePathLength(path) {
   let pathLength = 0;
   path.forEach(({ width, type }) => {
@@ -362,13 +579,31 @@ function reset() {
   path2 = generatePath(pathSegments, path1Widths);
   showWidths = false;
   redraw();
+  // What
+}
+
+function tracePaths() {
+  tracerDone = false;
+
+  tracePathButton.disabled = true;
+  redraw();
+  window.requestAnimationFrame((timestamp) =>
+    tracePath(timestamp, path1, "top")
+  );
+  // What
+  window.requestAnimationFrame((timestamp) =>
+    tracePath(timestamp, path2, "bottom")
+  );
+}
+
+function resetTracePaths() {
+  tracePathButton.disabled = false;
 }
 
 function guess(userInput) {
   userHasGuessed = true;
   let topPathLength = calculatePathLength(path1);
   let bottomPathLength = calculatePathLength(path2);
-  console.log(topPathLength, bottomPathLength);
   let userMessage = "";
 
   if (topPathLength > bottomPathLength && userInput === "top") {
