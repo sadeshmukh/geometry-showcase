@@ -577,7 +577,11 @@ function reset() {
     path1Widths.push(width);
   });
   path2 = generatePath(pathSegments, path1Widths);
+  tracerDone = true;
   showWidths = false;
+  tracePathButton.disabled = false;
+  start = { top: undefined, bottom: undefined };
+
   redraw();
   // What
 }
