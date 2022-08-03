@@ -28,7 +28,36 @@
 
     <div id="pathContainer" class="text-center px-2">
       <canvas id="canvas" class="border border-light"></canvas>
-      <button class="btn btn-primary btn-lg" onclick="reset()">Random</button>
+    </div>
+    <div class="text-center mt-2 mb-4" id="guessContainer">
+      <h1>Which path do you think is longer?</h1>
+      <button
+        class="btn btn-secondary btn-lg"
+        id="guessTop"
+        onclick="guess('top')"
+      >
+        Top
+      </button>
+      <button
+        class="btn btn-secondary btn-lg mx-3"
+        id="guessBottom"
+        onclick="guess('bottom')"
+      >
+        Bottom</button
+      ><button class="btn btn-outline-light btn-lg" onclick="toggleWidths()">
+        Reveal Widths
+      </button>
+    </div>
+    <div class="text-center mt-2 mb-4" id="hasGuessedContainer" hidden>
+      <h1 id="correctAnswerHeader">
+        You were... bro stop messing with da code
+      </h1>
+      <p id="correctAnswerDetails">don't mess with da code</p>
+      <button class="btn btn-danger btn-lg" onclick="unGuess(); reset()">
+        New
+      </button>
+    </div>
+    <div class="text-center">
       <button class="btn btn-success btn-lg" onclick="heartReset()">
         Heart!
       </button>

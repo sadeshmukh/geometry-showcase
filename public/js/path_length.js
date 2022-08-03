@@ -11,7 +11,17 @@ let path1;
 let path1Widths;
 let path2;
 
+const guessTop = document.getElementById("guessTop");
+const guessBottom = document.getElementById("guessBottom");
+const guessContainer = document.getElementById("guessContainer");
+const hasGuessedContainer = document.getElementById("hasGuessedContainer");
+const correctAnswerHeader = document.getElementById("correctAnswerHeader");
+const correctAnswerDetails = document.getElementById("correctAnswerDetails");
+
+let showWidths = false;
+
 const possibleLines = ["straight", "corner", "semicircle"];
+// const possibleLines = ["corner"];
 
 // Preset
 const arrowHeartPathTop = [
@@ -47,7 +57,7 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
 const initialWidth = window.innerWidth - 50;
-const initialHeight = window.innerHeight - 200;
+const initialHeight = window.innerHeight - 300;
 
 context.canvas.width = initialWidth;
 context.canvas.height = initialHeight;
@@ -140,12 +150,7 @@ function drawPath(path, half) {
 
     context.fillStyle = currentColor;
     context.strokeStyle = currentColor;
-    // console.log(
-    //   initialHeight / 2 - contextY,
-    //   initialHeight / 2,
-    //   pathHeight,
-    //   half
-    // );
+
     switch (type) {
       case "straight":
         context.moveTo(contextX, contextY);
@@ -268,53 +273,127 @@ function drawPath(path, half) {
     }
 
     // Draw text showing segment width
-    context.beginPath();
-    if (half === "top") {
-      contextY = initialHeight / 2 - pathGap - verticalTextDistance;
-    } else {
-      contextY = initialHeight / 2 + pathGap + verticalTextDistance;
-    }
-    context.lineWidth = fontLineWidth;
-    context.fillText(
-      width.toString() + " pixels wide",
-      contextX - width,
-      contextY
-    );
-    context.lineWidth = defaultLineWidth;
-    console.log(contextX, contextY);
-    context.stroke();
-    // Reset contextY
-    if (ends === "center") {
+    if (showWidths) {
+      context.beginPath();
       if (half === "top") {
-        contextY = initialHeight / 2 - pathGap;
+        contextY = initialHeight / 2 - pathGap - verticalTextDistance;
       } else {
-        contextY = initialHeight / 2 + pathGap;
+        contextY = initialHeight / 2 + pathGap + verticalTextDistance;
       }
-    } else {
-      if (half === "top") {
-        contextY = initialHeight / 2 - pathHeight - pathGap;
+      context.lineWidth = fontLineWidth;
+      context.fillText(
+        width.toString() + " pixels wide",
+        contextX - width,
+        contextY
+      );
+      context.lineWidth = defaultLineWidth;
+      context.stroke();
+      // Reset contextY
+      if (ends === "center") {
+        if (half === "top") {
+          contextY = initialHeight / 2 - pathGap;
+        } else {
+          contextY = initialHeight / 2 + pathGap;
+        }
       } else {
-        contextY = initialHeight / 2 + pathHeight + pathGap;
+        if (half === "top") {
+          contextY = initialHeight / 2 - pathHeight - pathGap;
+        } else {
+          contextY = initialHeight / 2 + pathHeight + pathGap;
+        }
       }
     }
+
     context.beginPath();
   });
 }
 
-function reset() {
+function calculatePathLength(path) {
+  let pathLength = 0;
+  path.forEach(({ width, type }) => {
+    switch (type) {
+      case "straight":
+        pathLength += Math.sqrt(width ** 2 + pathHeight ** 2);
+        break;
+      case "corner":
+        pathLength += width + pathHeight;
+        break;
+      case "semicircle":
+        pathLength += Math.PI * Math.sqrt(width ** 2 + pathHeight ** 2);
+        break;
+      default:
+        console.error("Impossible case");
+    }
+  });
+  return pathLength;
+}
+
+function toggleWidths() {
+  showWidths = !showWidths;
+  redraw();
+}
+
+function redraw() {
   context.clearRect(0, 0, initialWidth, initialWidth);
+
+  drawPath(path1, "top");
+  drawPath(path2, "bottom");
+}
+
+function reset() {
   path1 = generatePath(pathSegments);
   path1Widths = [];
   path1.map(({ width }) => {
     path1Widths.push(width);
   });
   path2 = generatePath(pathSegments, path1Widths);
+  showWidths = false;
+  redraw();
+}
 
-  drawPath(path1, "top");
-  drawPath(path2, "bottom");
-  //   if (JSON.encode(path1) === JSON.encode(path2)) {
-  //     alert("That's kinda cool");
-  //   }
+function guess(userInput) {
+  let topPathLength = calculatePathLength(path1);
+  let bottomPathLength = calculatePathLength(path2);
+  console.log(topPathLength, bottomPathLength);
+  let userMessage = "";
+  if (topPathLength === bottomPathLength) {
+    userMessage = "You were kind of correct!";
+  }
+  if (topPathLength > bottomPathLength && userInput === "top") {
+    userMessage = "You were correct!";
+  } else if (bottomPathLength > topPathLength && userInput === "bottom") {
+    userMessage = "You were correct!";
+  } else {
+    userMessage = "You were incorrect.";
+  }
+  correctAnswerHeader.innerText = userMessage;
+  let correctAnswerDetailsText = `<p>The top path was approximately ${Math.round(
+    topPathLength
+  )} pixels long</p>`;
+  correctAnswerDetailsText += `<p>The bottom path was approximately ${Math.round(
+    bottomPathLength
+  )} pixels long.</p>`;
+  if (topPathLength > bottomPathLength) {
+    correctAnswerDetailsText += `<p>The <b>top</b> path was longer by approximately ${Math.round(
+      topPathLength - bottomPathLength
+    )} pixels!</p>`;
+  } else {
+    correctAnswerDetailsText += `<p>The <b>bottom</b> path was longer by approximately ${Math.round(
+      bottomPathLength - topPathLength
+    )} pixels!</p>`;
+  }
+  if (topPathLength === bottomPathLength) {
+    correctAnswerDetailsText = `They are <em>exactly the same,</em> at ${topPathLength} pixels!`;
+  }
+  correctAnswerDetails.innerHTML = correctAnswerDetailsText;
+
+  guessContainer.hidden = true;
+  hasGuessedContainer.hidden = false;
+}
+
+function unGuess() {
+  guessContainer.hidden = false;
+  hasGuessedContainer.hidden = true;
 }
 
 function heartReset() {
