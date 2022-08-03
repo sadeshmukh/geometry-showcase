@@ -2,6 +2,7 @@ body {
   background-color: #212529;
   color: #f8f9fa;
   font-family: "Nunito";
+  margin-bottom: 75px;
 }
 
 .home-button {
@@ -11,4 +12,10 @@ body {
 
 b {
   font-weight: 900;
+}
+
+#footerGithubLogo {
+  height: 20px;
+  width: 20px;
+  color: red;
 }
