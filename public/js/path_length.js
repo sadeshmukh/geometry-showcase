@@ -430,6 +430,7 @@ function heartReset() {
   isHeartPath = true;
   youtubeThumbnailText.hidden = false;
   guessContainer.hidden = true;
+  hasGuessedContainer.hidden = true;
   heartButtonContainer.hidden = true;
   heartBackContainer.hidden = false;
   pathBeforeHeart1 = [...path1];
@@ -446,6 +447,8 @@ function heartBack() {
   path2 = [...pathBeforeHeart2];
   if (!userHasGuessed) {
     guessContainer.hidden = false;
+  } else {
+    hasGuessedContainer.hidden = false;
   }
   heartButtonContainer.hidden = false;
   heartBackContainer.hidden = true;
