@@ -31,7 +31,7 @@ const arrowHeartPathTop = [
   { width: 200, type: "semicircle", begins: "center", ends: "outer", index: 2 },
   { width: 200, type: "semicircle", begins: "outer", ends: "center", index: 3 },
   { width: 200, type: "straight", begins: "center", ends: "center", index: 4 },
-  { width: 200, type: "corner", begins: "center", ends: "outer", index: 5 },
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 5 },
 ];
 
 const arrowHeartPathBottom = [
@@ -40,13 +40,17 @@ const arrowHeartPathBottom = [
   { width: 200, type: "straight", begins: "center", ends: "outer", index: 2 },
   { width: 200, type: "straight", begins: "outer", ends: "center", index: 3 },
   { width: 200, type: "straight", begins: "center", ends: "center", index: 4 },
-  { width: 200, type: "corner", begins: "center", ends: "outer", index: 5 },
+  { width: 200, type: "straight", begins: "center", ends: "outer", index: 5 },
 ];
 
+let isHeartPath = false;
 const heartButtonContainer = document.getElementById("heartButtonContainer");
 const heartBackContainer = document.getElementById("heartBackContainer");
 let pathBeforeHeart1 = [];
 let pathBeforeHeart2 = [];
+let showWidthsBeforeHeart = false;
+
+const youtubeThumbnailText = document.getElementById("youtubeThumbnailText");
 
 // Canvas
 
@@ -134,20 +138,23 @@ function drawPath(path, half) {
     contextY = initialHeight / 2 + pathGap;
   }
 
-  context.beginPath();
-  context.fillStyle = heightTextColor;
-  if (half === "top") {
-    context.fillText(
-      pathHeight.toString() + " pixels tall",
-      contextX - horizontalTextDistance,
-      contextY - verticalTextDistance / 2
-    );
-  } else {
-    context.fillText(
-      pathHeight.toString() + "  pixels tall",
-      contextX - horizontalTextDistance,
-      contextY + verticalTextDistance / 2
-    );
+  // Draw height text
+  if (!isHeartPath) {
+    context.beginPath();
+    context.fillStyle = heightTextColor;
+    if (half === "top") {
+      context.fillText(
+        pathHeight.toString() + " pixels tall",
+        contextX - horizontalTextDistance,
+        contextY - verticalTextDistance / 2
+      );
+    } else {
+      context.fillText(
+        pathHeight.toString() + "  pixels tall",
+        contextX - horizontalTextDistance,
+        contextY + verticalTextDistance / 2
+      );
+    }
   }
 
   context.beginPath();
@@ -363,15 +370,16 @@ function guess(userInput) {
   let bottomPathLength = calculatePathLength(path2);
   console.log(topPathLength, bottomPathLength);
   let userMessage = "";
-  if (topPathLength === bottomPathLength) {
-    userMessage = "You were kind of correct!";
-  }
+
   if (topPathLength > bottomPathLength && userInput === "top") {
     userMessage = "You were correct!";
   } else if (bottomPathLength > topPathLength && userInput === "bottom") {
     userMessage = "You were correct!";
   } else {
     userMessage = "You were incorrect.";
+  }
+  if (topPathLength === bottomPathLength) {
+    userMessage = "You were kind of correct!";
   }
   correctAnswerHeader.innerText = userMessage;
   let correctAnswerDetailsText = `<p>The top path was approximately ${Math.round(
@@ -381,13 +389,25 @@ function guess(userInput) {
     bottomPathLength
   )} pixels long.</p>`;
   if (topPathLength > bottomPathLength) {
-    correctAnswerDetailsText += `<p>The <b>top</b> path was longer by approximately ${Math.round(
-      topPathLength - bottomPathLength
-    )} pixels!</p>`;
+    if (Math.round(Math.abs(topPathLength - bottomPathLength)) === 0) {
+      correctAnswerDetailsText += `<p>The <b>top</b> path was longer by approximately ${
+        Math.round((topPathLength - bottomPathLength) * 10) / 10
+      } pixels!</p>`;
+    } else {
+      correctAnswerDetailsText += `<p>The <b>top</b> path was longer by approximately ${Math.round(
+        topPathLength - bottomPathLength
+      )} pixels!</p>`;
+    }
   } else {
-    correctAnswerDetailsText += `<p>The <b>bottom</b> path was longer by approximately ${Math.round(
-      bottomPathLength - topPathLength
-    )} pixels!</p>`;
+    if (Math.round(Math.abs(topPathLength - bottomPathLength)) === 0) {
+      correctAnswerDetailsText += `<p>The <b>top</b> path was longer by approximately ${
+        Math.round((topPathLength - bottomPathLength) * 10) / 10
+      } pixels!</p>`;
+    } else {
+      correctAnswerDetailsText += `<p>The <b>bottom</b> path was longer by approximately ${Math.round(
+        bottomPathLength - topPathLength
+      )} pixels!</p>`;
+    }
   }
   if (topPathLength === bottomPathLength) {
     correctAnswerDetailsText = `They are <em>exactly the same,</em> at ${topPathLength} pixels!`;
@@ -405,6 +425,10 @@ function unGuess() {
 }
 
 function heartReset() {
+  showWidthsBeforeHeart = showWidths;
+  showWidths = false;
+  isHeartPath = true;
+  youtubeThumbnailText.hidden = false;
   guessContainer.hidden = true;
   heartButtonContainer.hidden = true;
   heartBackContainer.hidden = false;
@@ -416,6 +440,8 @@ function heartReset() {
 }
 
 function heartBack() {
+  showWidths = showWidthsBeforeHeart;
+  isHeartPath = false;
   path1 = [...pathBeforeHeart1];
   path2 = [...pathBeforeHeart2];
   if (!userHasGuessed) {
@@ -424,6 +450,10 @@ function heartBack() {
   heartButtonContainer.hidden = false;
   heartBackContainer.hidden = true;
   redraw();
+}
+
+function hideThumbnailText() {
+  youtubeThumbnailText.hidden = true;
 }
 
 reset();
