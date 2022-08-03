@@ -19,8 +19,8 @@ const arrowHeartPathTop = [
   { width: 200, type: "corner", begins: "outer", ends: "center", index: 1 },
   { width: 200, type: "semicircle", begins: "center", ends: "outer", index: 2 },
   { width: 200, type: "semicircle", begins: "outer", ends: "center", index: 3 },
-  { width: 200, type: "straight", begins: "center", ends: "outer", index: 4 },
-  { width: 200, type: "corner", begins: "outer", ends: "center", index: 4 },
+  { width: 200, type: "straight", begins: "center", ends: "center", index: 4 },
+  { width: 200, type: "corner", begins: "center", ends: "outer", index: 5 },
 ];
 
 const arrowHeartPathBottom = [
@@ -28,8 +28,8 @@ const arrowHeartPathBottom = [
   { width: 200, type: "corner", begins: "outer", ends: "center", index: 1 },
   { width: 200, type: "straight", begins: "center", ends: "outer", index: 2 },
   { width: 200, type: "straight", begins: "outer", ends: "center", index: 3 },
-  { width: 200, type: "straight", begins: "center", ends: "outer", index: 4 },
-  { width: 200, type: "corner", begins: "outer", ends: "center", index: 4 },
+  { width: 200, type: "straight", begins: "center", ends: "center", index: 4 },
+  { width: 200, type: "corner", begins: "center", ends: "outer", index: 5 },
 ];
 
 // Canvas
