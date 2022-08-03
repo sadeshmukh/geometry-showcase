@@ -3,6 +3,9 @@ const pathContainer = document.getElementById("pathContainer");
 const pathHeight = 150;
 const pathSegments = 6;
 const pathGap = 20 / 2;
+const verticalTextDistance = 250;
+const horizontalTextDistance = 200;
+const heightTextColor = "#ffffff";
 
 let path1;
 let path1Widths;
@@ -44,12 +47,15 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
 const initialWidth = window.innerWidth - 50;
-const initialHeight = window.innerHeight - 400;
+const initialHeight = window.innerHeight - 200;
 
 context.canvas.width = initialWidth;
 context.canvas.height = initialHeight;
 
+let defaultLineWidth = 5;
 context.lineWidth = 5;
+let fontLineWidth = 1;
+context.font = "20px 'Nunito'";
 const fullPathMinWidth = (initialWidth / 5) * 3;
 const fullPathMaxWidth = (initialWidth / 7) * 6;
 
@@ -98,12 +104,11 @@ function generatePath(pathLength, presetWidths = null) {
 }
 
 function drawPath(path, half) {
+  // Find total width of path to center
   let fullPathWidth = 0;
   path.forEach(({ width }) => {
     fullPathWidth += width;
   });
-
-  context.beginPath();
 
   let contextX = (initialWidth - fullPathWidth) / 2;
   let contextY;
@@ -113,6 +118,23 @@ function drawPath(path, half) {
     contextY = initialHeight / 2 + pathGap;
   }
 
+  context.beginPath();
+  context.fillStyle = heightTextColor;
+  if (half === "top") {
+    context.fillText(
+      pathHeight.toString() + " pixels tall",
+      contextX - horizontalTextDistance,
+      contextY - verticalTextDistance / 2
+    );
+  } else {
+    context.fillText(
+      pathHeight.toString() + "  pixels tall",
+      contextX - horizontalTextDistance,
+      contextY + verticalTextDistance / 2
+    );
+  }
+
+  context.beginPath();
   path.forEach(({ width, type, begins, ends, index }) => {
     let currentColor = lineColors[index % lineColors.length];
 
@@ -182,8 +204,6 @@ function drawPath(path, half) {
         contextX += width / 2;
         let angle;
 
-        console.log(angle);
-
         if (half === "top") {
           if (ends === "center") {
             angle = (1 / 2) * Math.PI - Math.atan(width / pathHeight);
@@ -247,6 +267,36 @@ function drawPath(path, half) {
         console.error("Impossible type for path section");
     }
 
+    // Draw text showing segment width
+    context.beginPath();
+    if (half === "top") {
+      contextY = initialHeight / 2 - pathGap - verticalTextDistance;
+    } else {
+      contextY = initialHeight / 2 + pathGap + verticalTextDistance;
+    }
+    context.lineWidth = fontLineWidth;
+    context.fillText(
+      width.toString() + " pixels wide",
+      contextX - width,
+      contextY
+    );
+    context.lineWidth = defaultLineWidth;
+    console.log(contextX, contextY);
+    context.stroke();
+    // Reset contextY
+    if (ends === "center") {
+      if (half === "top") {
+        contextY = initialHeight / 2 - pathGap;
+      } else {
+        contextY = initialHeight / 2 + pathGap;
+      }
+    } else {
+      if (half === "top") {
+        contextY = initialHeight / 2 - pathHeight - pathGap;
+      } else {
+        contextY = initialHeight / 2 + pathHeight + pathGap;
+      }
+    }
     context.beginPath();
   });
 }
