@@ -50,18 +50,24 @@
     </div>
     <div class="text-center mt-2 mb-4" id="hasGuessedContainer" hidden>
       <h1 id="correctAnswerHeader">
-        You were... bro stop messing with da code
+        <strike>Good</strike> Bad job messing with the code
       </h1>
-      <p id="correctAnswerDetails">don't mess with da code</p>
+      <p id="correctAnswerDetails" class="fs-5">don't mess with da code</p>
       <button class="btn btn-danger btn-lg" onclick="unGuess(); reset()">
-        New
+        Generate New
       </button>
     </div>
-    <div class="text-center">
+    <div class="text-center mt-3" id="heartButtonContainer">
       <button class="btn btn-success btn-lg" onclick="heartReset()">
         Heart!
       </button>
     </div>
+    <div id="heartBackContainer" class="text-center mt-3" hidden>
+      <buttton class="btn btn-danger btn-lg" onclick="heartBack()"
+        >Back</buttton
+      >
+    </div>
+
     <script src="js/path_length.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"

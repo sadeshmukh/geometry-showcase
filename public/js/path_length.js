@@ -11,6 +11,7 @@ let path1;
 let path1Widths;
 let path2;
 
+let userHasGuessed = false;
 const guessTop = document.getElementById("guessTop");
 const guessBottom = document.getElementById("guessBottom");
 const guessContainer = document.getElementById("guessContainer");
@@ -41,6 +42,11 @@ const arrowHeartPathBottom = [
   { width: 200, type: "straight", begins: "center", ends: "center", index: 4 },
   { width: 200, type: "corner", begins: "center", ends: "outer", index: 5 },
 ];
+
+const heartButtonContainer = document.getElementById("heartButtonContainer");
+const heartBackContainer = document.getElementById("heartBackContainer");
+let pathBeforeHeart1 = [];
+let pathBeforeHeart2 = [];
 
 // Canvas
 
@@ -352,6 +358,7 @@ function reset() {
 }
 
 function guess(userInput) {
+  userHasGuessed = true;
   let topPathLength = calculatePathLength(path1);
   let bottomPathLength = calculatePathLength(path2);
   console.log(topPathLength, bottomPathLength);
@@ -392,16 +399,31 @@ function guess(userInput) {
 }
 
 function unGuess() {
+  userHasGuessed = false;
   guessContainer.hidden = false;
   hasGuessedContainer.hidden = true;
 }
 
 function heartReset() {
-  context.clearRect(0, 0, initialWidth, initialWidth);
+  guessContainer.hidden = true;
+  heartButtonContainer.hidden = true;
+  heartBackContainer.hidden = false;
+  pathBeforeHeart1 = [...path1];
+  pathBeforeHeart2 = [...path2];
   path1 = [...arrowHeartPathTop];
   path2 = [...arrowHeartPathBottom];
-  drawPath(path1, "top");
-  drawPath(path2, "bottom");
+  redraw();
+}
+
+function heartBack() {
+  path1 = [...pathBeforeHeart1];
+  path2 = [...pathBeforeHeart2];
+  if (!userHasGuessed) {
+    guessContainer.hidden = false;
+  }
+  heartButtonContainer.hidden = false;
+  heartBackContainer.hidden = true;
+  redraw();
 }
 
 reset();

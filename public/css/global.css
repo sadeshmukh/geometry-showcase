@@ -8,3 +8,7 @@ body {
   font-family: "Montserrat";
   font-weight: bold;
 }
+
+b {
+  font-weight: 900;
+}
