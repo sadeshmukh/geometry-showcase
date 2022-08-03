@@ -21,7 +21,7 @@ const correctAnswerDetails = document.getElementById("correctAnswerDetails");
 
 let showWidths = false;
 
-const possibleLines = ["straight", "corner"];
+const possibleLines = ["straight", "corner", "semicircle"];
 // const possibleLines = ["corner"];
 
 // Preset
@@ -410,10 +410,90 @@ function drawTracer(
 
       context.moveTo(tracerPos[half][0], tracerPos[half][1] - tracerWidth / 2);
       context.lineTo(tracerPos[half][0], tracerPos[half][1] + tracerWidth / 2);
+      break;
     case "semicircle":
       // x: cos(angle) * radius
       // y: sin(angle) * radius
       // angle is = arc
+      console.log("huh");
+
+      let angleThrough = Math.PI * fractionThrough;
+
+      if (half === "top") {
+        if (path[currentSection].ends === "center") {
+          angleThrough -= 0.5 * Math.PI;
+        } else {
+          angleThrough -= 1 * Math.PI;
+        }
+      } else {
+        if (path[currentSection].ends === "center") {
+          angleThrough += 1 * Math.PI;
+        } else {
+          angleThrough *= -1;
+          angleThrough += 1.5 * Math.PI;
+        }
+      }
+
+      if (half === "bottom") {
+        angleThrough = 2 * Math.PI - angleThrough;
+      }
+
+      let baseAngle;
+      if (half === "top") {
+        if (path[currentSection].ends === "center") {
+          baseAngle = Math.atan(path[currentSection].width / pathHeight);
+        } else {
+          baseAngle = Math.atan(pathHeight / path[currentSection].width);
+        }
+      } else {
+        if (path[currentSection].ends === "center") {
+          baseAngle = Math.atan(pathHeight / path[currentSection].width);
+        } else {
+          baseAngle = Math.atan(path[currentSection].width / pathHeight);
+        }
+      }
+
+      let arcCenter;
+      console.log(initialHeight / 2 - tracerPos[half][1], half);
+
+      if (half === "top") {
+        if (path[currentSection].ends === "outer") {
+          arcCenter = [
+            tracerPos[half][0] + path[currentSection].width / 2,
+            tracerPos[half][1] - pathHeight / 2,
+          ];
+        } else {
+          arcCenter = [
+            tracerPos[half][0] + path[currentSection].width / 2,
+            tracerPos[half][1] + pathHeight / 2,
+          ];
+        }
+      } else {
+        if (path[currentSection].ends === "outer") {
+          arcCenter = [
+            tracerPos[half][0] + path[currentSection].width / 2,
+            tracerPos[half][1] + pathHeight / 2,
+          ];
+        } else {
+          arcCenter = [
+            tracerPos[half][0] + path[currentSection].width / 2,
+            tracerPos[half][1] - pathHeight / 2,
+          ];
+        }
+      }
+
+      const radius =
+        Math.sqrt(path[currentSection].width ** 2 + pathHeight ** 2) / 2;
+
+      const angleDiff = angleThrough - baseAngle;
+      const relX = Math.cos(angleDiff) * radius;
+      const relY = Math.sin(angleDiff) * radius;
+      const finalX = relX + arcCenter[0];
+      const finalY = relY + arcCenter[1];
+
+      context.moveTo(finalX, finalY - tracerWidth / 2);
+      context.lineTo(finalX, finalY + tracerWidth / 2);
+
       break;
     default:
       break;
@@ -450,7 +530,6 @@ function tracePath(timestamp, path, half, currentSection, distanceThrough) {
   if (!distanceThrough) {
     distanceThrough = 0;
   }
-  // Loops over path
   if (start[half] === undefined) {
     start[half] = timestamp;
   }
@@ -465,6 +544,7 @@ function tracePath(timestamp, path, half, currentSection, distanceThrough) {
       start = { top: undefined, bottom: undefined };
       tracerPos = { top: [0, 0], bottom: [0, 0] };
       resetTracePaths();
+      console.log("i am draw tracer hehe");
       drawTracer(
         path,
         currentSection,
@@ -506,6 +586,9 @@ function tracePath(timestamp, path, half, currentSection, distanceThrough) {
   context.beginPath();
   context.strokeStyle = "#ffffff";
   context.lineWidth = tracerWidth;
+  if (path[currentSection].type === "semicircle") {
+    console.log("saldfjlsakdfjl;a");
+  }
   if (half === "bottom") {
     drawTracer(path, currentSection, fractionThrough, half, distanceThrough);
   } else {
