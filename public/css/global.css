@@ -19,3 +19,13 @@ b {
   width: 20px;
   color: red;
 }
+
+#mainContent {
+  padding-left: 200px;
+  padding-right: 200px;
+}
+
+footer {
+  border-top: 10px;
+  border-color: white;
+}

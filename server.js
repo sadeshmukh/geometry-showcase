@@ -17,14 +17,14 @@ app.get("/path-length", (req, res) => {
   res.sendFile(`${__dirname}/html/path_length.html`);
 });
 
-// app.get("/how/:page", (req, res) => {
-//   let pageReq = req.params.page;
-//   if (howPages.includes(req.params.page)) {
-//     res.send("Valid how page");
-//   } else {
-//     res.send("Invalid how page");
-//   }
-// });
+app.get("/how/:page", (req, res) => {
+  let pageReq = req.params.page;
+  if (howPages.includes(req.params.page)) {
+    res.sendFile(`${__dirname}/how_pages/how_${req.params.page}.html`);
+  } else {
+    res.status(404).send("<h1>404</h1>");
+  }
+});
 
 app.get("/*", (req, res) => {
   res.status(404).send("<h1>404</h1>");

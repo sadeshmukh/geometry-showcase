@@ -427,15 +427,12 @@ function drawTracer(
         }
       } else {
         if (path[currentSection].ends === "center") {
+          angleThrough *= -1;
           angleThrough += 1 * Math.PI;
         } else {
           angleThrough *= -1;
           angleThrough += 1.5 * Math.PI;
         }
-      }
-
-      if (half === "bottom") {
-        angleThrough = 2 * Math.PI - angleThrough;
       }
 
       let baseAngle;
