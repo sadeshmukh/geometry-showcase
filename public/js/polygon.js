@@ -1,3 +1,8 @@
+const userLocale =
+  navigator.languages && navigator.languages.length
+    ? navigator.languages[0]
+    : navigator.language;
+
 let sidesInput = document.getElementById("sidesInput");
 let sides = 4;
 const maxSides = 20;
@@ -22,7 +27,9 @@ sizeInput.max = maxRadius;
 sizeInput.min = minRadius;
 sizeInput.step = radiusIncrement;
 
-const dotWidth = 20;
+// Of inscribed radius
+const dotWidth = 1 / 8;
+const minDotWidth = 10;
 const showDots = true;
 
 let showCircumscribedCircle = false;
@@ -121,14 +128,19 @@ function drawPolygonInscribed(n, radius) {
   context.stroke();
 
   // Draw dots
+
   if (showDots) {
+    let totalDotWidth = inscribedRadius * dotWidth;
+    if (totalDotWidth < minDotWidth) {
+      totalDotWidth = minDotWidth;
+    }
     vertices.forEach(([x, y]) => {
       context.beginPath();
 
-      context.moveTo(x, y - dotWidth / 2);
-      context.lineTo(x, y + dotWidth / 2);
+      context.moveTo(x, y - totalDotWidth / 2);
+      context.lineTo(x, y + totalDotWidth / 2);
       let originalLineWidth = context.lineWidth;
-      context.lineWidth = dotWidth;
+      context.lineWidth = totalDotWidth;
       context.stroke();
       context.lineWidth = originalLineWidth;
     });
@@ -155,12 +167,12 @@ function writeText() {
   const circleArea = calculateCircleArea(inscribedRadius);
   const polyArea = calculatePolygonArea(inscribedRadius, sides);
   const circlePolyRatio = polyArea / circleArea;
-  circleAreaText.innerText = `Area of circle: ${
+  circleAreaText.innerText = `Circle: ${(
     Math.round(circleArea / 10) * 10
-  } pixels²`;
-  polygonAreaText.innerText = `Area of polygon: ${
+  ).toLocaleString(userLocale)} pixels²`;
+  polygonAreaText.innerText = `Polygon: ${(
     Math.round(polyArea / 10) * 10
-  } pixels²`;
+  ).toLocaleString(userLocale)} pixels²`;
   circlePolygonRatioText.innerText = `${
     Math.round(circlePolyRatio * 100) / 100
   } : 1`;
