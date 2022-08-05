@@ -77,6 +77,14 @@ context.canvas.height = initialHeight;
 context.lineWidth = 5;
 context.strokeStyle = "#ffffff";
 
+const progressiveColors = [
+  [220, 53, 69],
+  [253, 126, 20],
+  [100, 76, 3],
+  [25, 135, 84],
+  [106, 16, 142],
+];
+
 function sizeChange({ value }) {
   inscribedRadius = parseInt(value);
   updateAll();
@@ -105,6 +113,7 @@ function calculatePolygonArea(radius, n) {
 }
 
 // Not in use - draws by actually calculating each point, rather than drawPolygonInscribed() which draws points from center
+// Also unfinished
 function drawPolygonBySide(n, inputSideLength) {
   // Converted to radians
   let angle = Math.PI - Math.PI * ((n - 2) / n);
@@ -137,6 +146,31 @@ function drawPolygonInscribed(n, radius) {
   let contextX,
     contextY = (0, 0);
   const vertices = [];
+  // Take difference in rgb values, ex: 50, 100
+  // Take fraction, multiply (fraction through) * difference and add to base value
+  const fractionThrough = (n - minSides) / (maxSides - minSides);
+  let currentSection = Math.ceil(
+    fractionThrough * (progressiveColors.length - 1)
+  );
+  if (currentSection < 1) {
+    currentSection = 1;
+  }
+  let sections = progressiveColors.length - 1;
+
+  const progressiveColor1 = progressiveColors[currentSection - 1];
+  const progressiveColor2 = progressiveColors[currentSection];
+  let rangeFractionThrough =
+    (fractionThrough - currentSection / sections) * 4 + 1;
+  // fraction - section/sections = rangefractionthrough
+  const currentColor = [
+    (progressiveColor2[0] - progressiveColor1[0]) * rangeFractionThrough +
+      progressiveColor1[0],
+    (progressiveColor2[1] - progressiveColor1[1]) * rangeFractionThrough +
+      progressiveColor1[1],
+    (progressiveColor2[2] - progressiveColor1[2]) * rangeFractionThrough +
+      progressiveColor1[2],
+  ];
+  context.strokeStyle = `rgb(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]})`;
   context.beginPath();
   for (let i = 0; i < n; i++) {
     contextX = initialWidth / 2 + radius * Math.cos(angle * i + angleOffset);
@@ -148,7 +182,6 @@ function drawPolygonInscribed(n, radius) {
   context.stroke();
 
   // Draw dots
-
   if (showDots) {
     let totalDotWidth = inscribedRadius * dotWidth;
     if (totalDotWidth < minDotWidth) {
@@ -195,7 +228,7 @@ function writeText() {
 }
 
 function writePolygonName(n) {
-  polygonName.innerText = regularPolygonNames[n];
+  polygonName.innerText = `${regularPolygonNames[n]}: ${n} Sides`;
 }
 
 function updateAll() {
