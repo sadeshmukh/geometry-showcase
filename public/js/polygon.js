@@ -22,8 +22,17 @@ sizeInput.max = maxRadius;
 sizeInput.min = minRadius;
 sizeInput.step = radiusIncrement;
 
+const dotWidth = 20;
+const showDots = true;
+
 let showCircumscribedCircle = false;
 const circleLineWidth = 2;
+
+const circleAreaText = document.getElementById("circleAreaText");
+const polygonAreaText = document.getElementById("polygonAreaText");
+const circlePolygonRatioText = document.getElementById(
+  "circlePolygonRatioText"
+);
 
 // Canvas
 const canvas = document.getElementById("canvas");
@@ -40,17 +49,30 @@ context.strokeStyle = "#ffffff";
 
 function sizeChange({ value }) {
   inscribedRadius = parseInt(value);
-  drawAll();
+  updateAll();
 }
 
 function sidesChange({ value }) {
   sides = parseInt(value);
-  drawAll();
+  updateAll();
 }
 
 function toggleCircleShown() {
   showCircumscribedCircle = !showCircumscribedCircle;
-  drawAll();
+  updateAll();
+}
+
+function calculateCircleArea(radius) {
+  return Math.PI * radius ** 2;
+}
+
+function calculatePolygonArea(radius, n) {
+  let angle = Math.PI - Math.PI * ((n - 2) / n);
+  const outerSideLength =
+    (radius / Math.sin(angle / 2)) * Math.sin(Math.PI - angle);
+  const apothem = Math.sqrt(radius ** 2 - (outerSideLength / 2) ** 2);
+  console.log(radius, outerSideLength);
+  return (1 / 2) * apothem * outerSideLength * n;
 }
 
 // Not in use - draws by actually calculating each point, rather than drawPolygonInscribed() which draws points from center
@@ -86,15 +108,31 @@ function drawPolygonInscribed(n, radius) {
   let angleOffset = -0.5 * Math.PI;
   let contextX,
     contextY = (0, 0);
+  const vertices = [];
   context.beginPath();
   for (let i = 0; i < n; i++) {
     contextX = initialWidth / 2 + radius * Math.cos(angle * i + angleOffset);
     contextY = initialHeight / 2 + radius * Math.sin(angle * i + angleOffset);
     // console.log(radius * Math.cos(angle * i), contextY);
     context.lineTo(contextX, contextY);
+    vertices.push([contextX, contextY]);
   }
   context.closePath();
   context.stroke();
+
+  // Draw dots
+  if (showDots) {
+    vertices.forEach(([x, y]) => {
+      context.beginPath();
+
+      context.moveTo(x, y - dotWidth / 2);
+      context.lineTo(x, y + dotWidth / 2);
+      let originalLineWidth = context.lineWidth;
+      context.lineWidth = dotWidth;
+      context.stroke();
+      context.lineWidth = originalLineWidth;
+    });
+  }
 }
 
 function drawCircumscribedCircle(radius) {
@@ -113,13 +151,29 @@ function drawCircumscribedCircle(radius) {
   context.lineWidth = originalLineWidth;
 }
 
-function drawAll() {
+function writeText() {
+  const circleArea = calculateCircleArea(inscribedRadius);
+  const polyArea = calculatePolygonArea(inscribedRadius, sides);
+  const circlePolyRatio = polyArea / circleArea;
+  circleAreaText.innerText = `Area of circle: ${
+    Math.round(circleArea / 10) * 10
+  } pixels²`;
+  polygonAreaText.innerText = `Area of polygon: ${
+    Math.round(polyArea / 10) * 10
+  } pixels²`;
+  circlePolygonRatioText.innerText = `${
+    Math.round(circlePolyRatio * 100) / 100
+  } : 1`;
+}
+
+function updateAll() {
   context.clearRect(0, 0, initialWidth, initialHeight);
 
   drawPolygonInscribed(sides, inscribedRadius);
   if (showCircumscribedCircle) {
     drawCircumscribedCircle(inscribedRadius);
   }
+  writeText();
 }
 
-drawAll();
+updateAll();
