@@ -23,19 +23,6 @@ const sideC = document.getElementById("triangleSideInputC");
 
 let lastChanged = ["A", "B", "C"];
 
-function setSidesHaveChanged(boolean) {
-  sidesHaveChanged = boolean;
-  sidesUpdateButton.disabled = !boolean;
-  if (sidesHaveChanged) {
-    // button enabled
-    sidesUpdateButton.classList.remove("btn-secondary");
-    sidesUpdateButton.classList.add("btn-success");
-  } else {
-    sidesUpdateButton.classList.add("btn-secondary");
-    sidesUpdateButton.classList.remove("btn-success");
-  }
-}
-
 function onSidesChange(letter) {
   let sideAVal = parseInt(sideA.value);
   let sideBVal = parseInt(sideB.value);
@@ -50,15 +37,10 @@ function onSidesChange(letter) {
   const index = lastChanged.indexOf(letter);
   lastChanged.splice(index, 1);
   lastChanged.push(letter);
+  console.log("new", lastChanged[0]);
   let solveFor = lastChanged[0];
-  if (sideCVal < sideAVal || sideCVal < sideBVal) {
-    if (sideAVal < sideCVal) {
-      solveFor = "B";
-    } else if (sideBVal < sideCVal) {
-      solveFor = "A";
-    } else {
-      return;
-    }
+  if ((sideCVal < sideAVal || sideCVal < sideBVal) && lastChanged[2] !== "C") {
+    solveFor = "C";
   }
   switch (solveFor) {
     case "A":
@@ -77,7 +59,7 @@ function onSidesChange(letter) {
       }
       break;
     default:
-      throw "Impossible dropdown value";
+      console.error("Impossible solve for value");
   }
   sideAVal = parseInt(sideA.value);
   sideBVal = parseInt(sideB.value);
@@ -88,7 +70,6 @@ function onSidesChange(letter) {
   sideAVal = parseInt(sideA.value);
   sideBVal = parseInt(sideB.value);
   sideCVal = parseInt(sideC.value);
-  console.log(sideAVal, sideBVal, sideCVal);
   // side A = width, side B = height
   // Check if ratio of width to intialWidth is greater than height to initialHeight
   let scaleBy;
@@ -133,70 +114,6 @@ function onSidesChange(letter) {
   // Draws line back to original
   context.closePath();
   context.stroke();
-  sideA.value = Math.round(sideA.value * 100) / 100;
-  sideB.value = Math.round(sideB.value * 100) / 100;
-
-  sideC.value = Math.round(sideC.value * 100) / 100;
-}
-
-function onSidesSubmit(event = false) {
-  if (event) {
-    event.preventDefault();
-  }
-
-  let sideA = document.getElementById("triangleSideInputA");
-  let sideAVal = parseInt(sideA.value);
-  let sideB = document.getElementById("triangleSideInputB");
-  let sideBVal = parseInt(sideB.value);
-  let sideC = document.getElementById("triangleSideInputC");
-  let sideCVal = parseInt(sideC.value);
-
-  let solveForSideDropdown = document.getElementById(
-    "solveForSideDropdown"
-  ).value;
-
-  switch (solveForSideDropdown) {
-    case "auto":
-      console.log(sideAVal, sideBVal, sideCVal);
-      if (sideAVal && sideBVal) {
-        sideC.value = Math.sqrt(sideAVal ** 2 + sideBVal ** 2);
-      } else if (sideAVal && sideCVal) {
-        sideB.value = Math.sqrt(sideCVal ** 2 - sideAVal ** 2);
-      } else if (sideBVal && sideCVal) {
-        sideA.value = Math.sqrt(sideCVal ** 2 - sideBVal ** 2);
-      } else {
-        console.log("Not enough values to calculate");
-        break;
-      }
-      console.log(sideAVal, sideBVal, sideCVal);
-      setSidesHaveChanged(false);
-      break;
-    case "A":
-      if (sideBVal && sideCVal) {
-        sideA.value = Math.sqrt(sideCVal ** 2 - sideBVal ** 2);
-        setSidesHaveChanged(false);
-      }
-      break;
-    case "B":
-      if (sideAVal && sideCVal) {
-        sideB.value = Math.sqrt(sideCVal ** 2 - sideAVal ** 2);
-        setSidesHaveChanged(false);
-      }
-      break;
-    case "C":
-      if (sideAVal && sideBVal) {
-        sideC.value = Math.sqrt(sideAVal ** 2 + sideBVal ** 2);
-        setSidesHaveChanged(false);
-      }
-      break;
-    default:
-      throw "Impossible dropdown value";
-  }
-
-  if (!sidesHaveChanged) {
-  }
-  // Round values
-
   sideA.value = Math.round(sideA.value * 100) / 100;
   sideB.value = Math.round(sideB.value * 100) / 100;
 
