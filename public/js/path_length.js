@@ -703,7 +703,7 @@ function guess(userInput) {
   correctAnswerHeader.innerText = userMessage;
   let correctAnswerDetailsText = `<p>The top path was approximately ${Math.round(
     topPathLength
-  )} pixels long</p>`;
+  )} pixels long.</p>`;
   correctAnswerDetailsText += `<p>The bottom path was approximately ${Math.round(
     bottomPathLength
   )} pixels long.</p>`;
