@@ -35,6 +35,7 @@ const showDots = true;
 
 let showCircumscribedCircle = false;
 const circleLineWidth = 2;
+const circleColor = "#ffffff";
 
 const circleAreaText = document.getElementById("circleAreaText");
 const polygonAreaText = document.getElementById("polygonAreaText");
@@ -205,6 +206,7 @@ function drawPolygonInscribed(n, radius) {
 
 function drawCircumscribedCircle(radius) {
   context.beginPath();
+  context.strokeStyle = circleColor;
   context.arc(initialWidth / 2, initialHeight / 2, radius, 0, 2 * Math.PI);
   const originalLineWidth = context.lineWidth;
   context.lineWidth = circleLineWidth;
@@ -233,11 +235,10 @@ function writePolygonName(n) {
 
 function updateAll() {
   context.clearRect(0, 0, initialWidth, initialHeight);
-
-  drawPolygonInscribed(sides, inscribedRadius);
   if (showCircumscribedCircle) {
     drawCircumscribedCircle(inscribedRadius);
   }
+  drawPolygonInscribed(sides, inscribedRadius);
 
   writePolygonName(sides);
   writeText();
