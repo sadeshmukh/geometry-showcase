@@ -30,6 +30,7 @@ sizeInput.step = radiusIncrement;
 // Of inscribed radius
 const dotWidth = 1 / 8;
 const minDotWidth = 10;
+const maxDotWidth = 30;
 const showDots = true;
 
 let showCircumscribedCircle = false;
@@ -40,6 +41,28 @@ const polygonAreaText = document.getElementById("polygonAreaText");
 const circlePolygonRatioText = document.getElementById(
   "circlePolygonRatioText"
 );
+
+const polygonName = document.getElementById("polygonName");
+const regularPolygonNames = {
+  3: "Triangle",
+  4: "Square",
+  5: "Pentagon",
+  6: "Hexagon",
+  7: "Septagon",
+  8: "Octagon",
+  9: "Nonagon",
+  10: "Decagon",
+  11: "Hendecagon",
+  12: "Dodecagon",
+  13: "Triskaidecagon",
+  14: "Tetradecagon",
+  15: "Pentadecagon",
+  16: "Hexadecagon",
+  17: "Heptadecagon",
+  18: "Octadecagon",
+  19: "Nonadecagon",
+  20: "Icosagon",
+};
 
 // Canvas
 const canvas = document.getElementById("canvas");
@@ -78,7 +101,6 @@ function calculatePolygonArea(radius, n) {
   const outerSideLength =
     (radius / Math.sin(angle / 2)) * Math.sin(Math.PI - angle);
   const apothem = Math.sqrt(radius ** 2 - (outerSideLength / 2) ** 2);
-  console.log(radius, outerSideLength);
   return (1 / 2) * apothem * outerSideLength * n;
 }
 
@@ -96,7 +118,6 @@ function drawPolygonBySide(n, inputSideLength) {
     innerTriangleHeight += centerDistance;
   }
   const polygonHeight = innerTriangleHeight;
-  console.log(centerDistance, polygonHeight);
 
   let contextX = (initialWidth - inputSideLength) / 2;
   let contextY = (initialHeight - polygonHeight) / 2;
@@ -120,7 +141,6 @@ function drawPolygonInscribed(n, radius) {
   for (let i = 0; i < n; i++) {
     contextX = initialWidth / 2 + radius * Math.cos(angle * i + angleOffset);
     contextY = initialHeight / 2 + radius * Math.sin(angle * i + angleOffset);
-    // console.log(radius * Math.cos(angle * i), contextY);
     context.lineTo(contextX, contextY);
     vertices.push([contextX, contextY]);
   }
@@ -133,6 +153,9 @@ function drawPolygonInscribed(n, radius) {
     let totalDotWidth = inscribedRadius * dotWidth;
     if (totalDotWidth < minDotWidth) {
       totalDotWidth = minDotWidth;
+    }
+    if (totalDotWidth > maxDotWidth) {
+      totalDotWidth = maxDotWidth;
     }
     vertices.forEach(([x, y]) => {
       context.beginPath();
@@ -148,15 +171,8 @@ function drawPolygonInscribed(n, radius) {
 }
 
 function drawCircumscribedCircle(radius) {
-  console.log("hi my name jeff");
   context.beginPath();
-  context.arc(
-    initialWidth / 2,
-    initialHeight / 2,
-    radius + Math.ceil(context.lineWidth / 2),
-    0,
-    2 * Math.PI
-  );
+  context.arc(initialWidth / 2, initialHeight / 2, radius, 0, 2 * Math.PI);
   const originalLineWidth = context.lineWidth;
   context.lineWidth = circleLineWidth;
   context.stroke();
@@ -178,6 +194,10 @@ function writeText() {
   } : 1`;
 }
 
+function writePolygonName(n) {
+  polygonName.innerText = regularPolygonNames[n];
+}
+
 function updateAll() {
   context.clearRect(0, 0, initialWidth, initialHeight);
 
@@ -185,6 +205,8 @@ function updateAll() {
   if (showCircumscribedCircle) {
     drawCircumscribedCircle(inscribedRadius);
   }
+
+  writePolygonName(sides);
   writeText();
 }
 
