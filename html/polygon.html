@@ -63,9 +63,31 @@
         />
       </div>
       <div class="col-2 text-start">
-        <button class="btn btn-light ms-3" onclick="toggleCircleShown()">
+        <div class="form-check form-switch">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="circleToggle"
+            oninput="circleToggleChange(this)"
+          /><label class="form-check-label" for="circleToggle">
+            Enclosing circle
+          </label>
+        </div>
+        <!-- <button class="btn btn-light ms-3" onclick="toggleCircleShown()">
           Show enclosing circle
-        </button>
+        </button> -->
+        <div class="form-check form-switch">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="verticesToggle"
+            oninput="verticesToggleChange(this)"
+            checked="true"
+          />
+          <label class="form-check-label" for="verticesToggle">
+            Vertices dots
+          </label>
+        </div>
       </div>
     </div>
 

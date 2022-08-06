@@ -3,6 +3,27 @@ const userLocale =
     ? navigator.languages[0]
     : navigator.language;
 
+// Canvas
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+
+const initialWidth = window.innerWidth - 50;
+const initialHeight = window.innerHeight - 300;
+
+context.canvas.width = initialWidth;
+context.canvas.height = initialHeight;
+
+context.lineWidth = 5;
+context.strokeStyle = "#ffffff";
+
+const smoothColors = [
+  [220, 53, 69],
+  [255, 193, 7],
+  [25, 135, 84],
+  [13, 110, 253],
+  [106, 16, 142],
+];
+
 let sidesInput = document.getElementById("sidesInput");
 let sides = 4;
 const maxSides = 20;
@@ -21,9 +42,10 @@ const sideLengthIncrement = 10;
 const dotWidth = 1 / 8;
 const minDotWidth = 10;
 const maxDotWidth = 30;
-const showDots = true;
 
+const circleToggle = document.getElementById("circleToggle");
 let showCircumscribedCircle = false;
+circleToggle.checked = showCircumscribedCircle;
 const circleLineWidth = 2;
 const circleColor = "#ffffff";
 
@@ -55,27 +77,6 @@ const regularPolygonNames = {
   20: "Icosagon",
 };
 
-// Canvas
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
-
-const initialWidth = window.innerWidth - 50;
-const initialHeight = window.innerHeight - 300;
-
-context.canvas.width = initialWidth;
-context.canvas.height = initialHeight;
-
-context.lineWidth = 5;
-context.strokeStyle = "#ffffff";
-
-const smoothColors = [
-  [220, 53, 69],
-  [255, 193, 7],
-  [25, 135, 84],
-  [13, 110, 253],
-  [106, 16, 142],
-];
-
 const sizeInput = document.getElementById("sizeInput");
 let circumscribedRadius = initialHeight / 7;
 const maxRadius = 3 * circumscribedRadius;
@@ -86,6 +87,10 @@ sizeInput.max = maxRadius;
 sizeInput.min = minRadius;
 sizeInput.step = radiusIncrement;
 
+const verticesToggle = document.getElementById("verticesToggle");
+let showVertices = true;
+verticesToggle.checked = showVertices;
+
 function sizeChange({ value }) {
   circumscribedRadius = parseInt(value);
   updateAll();
@@ -93,6 +98,16 @@ function sizeChange({ value }) {
 
 function sidesChange({ value }) {
   sides = parseInt(value);
+  updateAll();
+}
+
+function circleToggleChange({ checked }) {
+  showCircumscribedCircle = checked;
+  updateAll();
+}
+
+function verticesToggleChange({ checked }) {
+  showVertices = checked;
   updateAll();
 }
 
@@ -182,7 +197,7 @@ function drawPolygonInscribed(n, radius) {
   context.stroke();
 
   // Draw dots
-  if (showDots) {
+  if (showVertices) {
     let totalDotWidth = circumscribedRadius * dotWidth;
     if (totalDotWidth < minDotWidth) {
       totalDotWidth = minDotWidth;
