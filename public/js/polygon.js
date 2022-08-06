@@ -18,11 +18,11 @@ const minSideLength = 50;
 const sideLengthIncrement = 10;
 
 const sizeInput = document.getElementById("sizeInput");
-let inscribedRadius = 150;
+let circumscribedRadius = 150;
 const maxRadius = 500;
 const minRadius = 30;
 const radiusIncrement = 5;
-sizeInput.value = inscribedRadius;
+sizeInput.value = circumscribedRadius;
 sizeInput.max = maxRadius;
 sizeInput.min = minRadius;
 sizeInput.step = radiusIncrement;
@@ -87,7 +87,7 @@ const smoothColors = [
 ];
 
 function sizeChange({ value }) {
-  inscribedRadius = parseInt(value);
+  circumscribedRadius = parseInt(value);
   updateAll();
 }
 
@@ -183,7 +183,7 @@ function drawPolygonInscribed(n, radius) {
 
   // Draw dots
   if (showDots) {
-    let totalDotWidth = inscribedRadius * dotWidth;
+    let totalDotWidth = circumscribedRadius * dotWidth;
     if (totalDotWidth < minDotWidth) {
       totalDotWidth = minDotWidth;
     }
@@ -214,8 +214,8 @@ function drawCircumscribedCircle(radius) {
 }
 
 function writeText() {
-  const circleArea = calculateCircleArea(inscribedRadius);
-  const polyArea = calculatePolygonArea(inscribedRadius, sides);
+  const circleArea = calculateCircleArea(circumscribedRadius);
+  const polyArea = calculatePolygonArea(circumscribedRadius, sides);
   const circlePolyRatio = polyArea / circleArea;
   circleAreaText.innerText = `Circle: ${(
     Math.round(circleArea / 10) * 10
@@ -235,9 +235,9 @@ function writePolygonName(n) {
 function updateAll() {
   context.clearRect(0, 0, initialWidth, initialHeight);
   if (showCircumscribedCircle) {
-    drawCircumscribedCircle(inscribedRadius);
+    drawCircumscribedCircle(circumscribedRadius);
   }
-  drawPolygonInscribed(sides, inscribedRadius);
+  drawPolygonInscribed(sides, circumscribedRadius);
 
   writePolygonName(sides);
   writeText();
