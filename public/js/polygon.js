@@ -78,7 +78,7 @@ context.canvas.height = initialHeight;
 context.lineWidth = 5;
 context.strokeStyle = "#ffffff";
 
-const progressiveColors = [
+const smoothColors = [
   [220, 53, 69],
   [255, 193, 7],
   [25, 135, 84],
@@ -110,7 +110,7 @@ function calculatePolygonArea(radius, n) {
   const outerSideLength =
     (radius / Math.sin(angle / 2)) * Math.sin(Math.PI - angle);
   const apothem = Math.sqrt(radius ** 2 - (outerSideLength / 2) ** 2);
-  return (1 / 2) * apothem * outerSideLength * n;
+  return (apothem * outerSideLength * n) / 2;
 }
 
 // Not in use - draws by actually calculating each point, rather than drawPolygonInscribed() which draws points from center
@@ -150,26 +150,25 @@ function drawPolygonInscribed(n, radius) {
   // Take difference in rgb values, ex: 50, 100
   // Take fraction, multiply (fraction through) * difference and add to base value
   const fractionThrough = (n - minSides) / (maxSides - minSides);
-  let currentSection = Math.ceil(
-    fractionThrough * (progressiveColors.length - 1)
-  );
+  let currentSection = Math.ceil(fractionThrough * (smoothColors.length - 1));
   if (currentSection < 1) {
     currentSection = 1;
   }
-  let sections = progressiveColors.length - 1;
+  let sections = smoothColors.length - 1;
 
-  const progressiveColor1 = progressiveColors[currentSection - 1];
-  const progressiveColor2 = progressiveColors[currentSection];
+  const smoothColor1 = smoothColors[currentSection - 1];
+  const smoothColor2 = smoothColors[currentSection];
   let rangeFractionThrough =
-    (fractionThrough - currentSection / sections) * 4 + 1;
+    (fractionThrough - currentSection / sections) * (smoothColors.length - 1) +
+    1;
   // fraction - section/sections = rangefractionthrough
   const currentColor = [
-    (progressiveColor2[0] - progressiveColor1[0]) * rangeFractionThrough +
-      progressiveColor1[0],
-    (progressiveColor2[1] - progressiveColor1[1]) * rangeFractionThrough +
-      progressiveColor1[1],
-    (progressiveColor2[2] - progressiveColor1[2]) * rangeFractionThrough +
-      progressiveColor1[2],
+    (smoothColor2[0] - smoothColor1[0]) * rangeFractionThrough +
+      smoothColor1[0],
+    (smoothColor2[1] - smoothColor1[1]) * rangeFractionThrough +
+      smoothColor1[1],
+    (smoothColor2[2] - smoothColor1[2]) * rangeFractionThrough +
+      smoothColor1[2],
   ];
   context.strokeStyle = `rgb(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]})`;
   context.beginPath();

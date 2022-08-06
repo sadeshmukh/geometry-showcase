@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="../css/gist_darkmode.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../css/global.css" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@400;700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Noto+Sans+Mono:wght@100;200;400;600;800&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Open+Sans:wght@300;500;600;700;800&family=Roboto+Mono:wght@500&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>How I made Polygon</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark pt-1 ps-3">
+      <a class="navbar-brand home-button fs-1" href="/">Home</a>
+    </nav>
+    <h1 class="text-center">How I made Polygon</h1>
+    <div class="px-5 w-100 mt-5">
+      <img class="w-100" src="../img/polygon_example_highdef.png" />
+    </div>
+    <section id="mainContent" class="text-center">
+      <h2>Drawing the polygon</h2>
+      <p class="fs-5 my-5 text-start">
+        Starting off with polygon, I had two ideas on how to approach drawing
+        the polygon. Initially, I was going to draw a line from each point to
+        the next, using the angle rotation to calculate a point from the next.
+        However, after its implementation, it became clear there was a better
+        solution. The final solution drew points out from the center, segmenting
+        <code>2 * Math.PI</code> radians into the number of sides. With a quick
+        adjustment of <code>0.5 * Math.PI</code>, the starting point was kept at
+        the top.
+      </p>
+      <div class="w-50 mx-auto">
+        <img src="../img/polygon_example1.png" class="rounded w-100" />
+        <label class="mt-2"
+          >Illustration of how points are drawn from center</label
+        >
+      </div>
+      <p class="fs-5 my-5 text-start">
+        To draw each point, the code would take the angle (plus the offset) and
+        calculate the x and y offset of the line using <code>Math.cos</code> and
+        <code>Math.sin</code>. The cosine and sine of the angle rotation provide
+        the ratio between the hypotenuse and the given side. Multiplying by the
+        hypotenuse (as sine and cosine represent <code>side:hypotenuse</code>)
+        gives the x and y coordinate of the point.
+      </p>
+
+      <div class="px-5">
+        <script src="https://gist.github.com/sadeshmukh/cd3bc62688d6af5b277e39366903ee72.js?file=drawPolygonPoints.js"></script>
+        <label
+          >loop inside drawInscribedPolygon() from public/js/polygon.js</label
+        >
+      </div>
+      <h2 class="mt-5">Calculating the areas</h2>
+      <p class="fs-5 my-5 text-start">
+        To calculate the areas, I created separate functions to calculate the
+        area of the circle and the polygon. Since the size of the polygon was
+        only known by the circumscribed radius of the circle (a misnomer in my
+        code, <code>inscribedRadius</code>), I would have to find the height of
+        the inner triangles inside the polygon.
+      </p>
+      <div class="w-50 mx-auto">
+        <img src="../img/polygon_example2.png" class="rounded w-100" />
+        <label class="mt-2"
+          >Illustration of how to get triangle height of polygon</label
+        >
+      </div>
+      <p class="fs-5 my-5 text-start">
+        To find it, I first found the angle opposite it, which was equal to half
+        of one of the interior angles. Using the Law of Sines, I found the outer
+        side length, as the angle on the inside was equal to
+        <code>Math.PI - interiorAngle</code>. From here, it was easy going -
+        using the Pythagorean Theorem, I was able to find the triangle height,
+        and with it, calculate the area of the polygon (<code
+          >apothem * outerSideLength * n / 2</code
+        >)
+      </p>
+      <div class="px-5">
+        <script src="https://gist.github.com/sadeshmukh/cd3bc62688d6af5b277e39366903ee72.js?file=calculatePolygonArea.js"></script>
+        <label>function calculatePolygonArea() from public/js/polygon.js</label>
+      </div>
+      <h2 class="mt-5">Smooth coloring</h2>
+      <p class="fs-5 my-5 text-start">
+        Initially, I created a color shift between two colors. After seeing how
+        it worked, I thought it would be cool to implement a multi-color shift.
+        To implement a multi-color shift that would work with
+        <code>n</code> colors requires a slightly altered strategy - first,
+        finding the two values to transition between, and finding the fraction
+        of the way through between <em>those two colors</em>. To do this, I
+        found the fraction of the total way through, then subtracted previous
+        "sections" from it, as is shown below.
+      </p>
+      <div class="px-5">
+        <script src="https://gist.github.com/sadeshmukh/cd3bc62688d6af5b277e39366903ee72.js?file=calculateSmoothColor.js"></script>
+        <label
+          >part of function drawInscribedPolygon() from
+          public/js/polygon.js</label
+        >
+      </div>
+      <p class="fs-5 my-5 text-start">
+        With a few more touches, like the polygon names and circle overlay, it
+        was done. You can check it out
+        <a href="../polygon" class="text-light">here</a>, or check out the
+        github repository
+        <a
+          href="https://github.com/sadeshmukh/geometry-showcase"
+          class="text-light"
+          >here</a
+        >. This was made by Sahil.
+      </p>
+    </section>
+    <footer
+      class="bg-dark fixed-bottom text-center p-3 border-top border-light"
+    >
+      <a
+        href="https://github.com/sadeshmukh/geometry-showcase"
+        target="_blank"
+        class="text-light text-decoration-none"
+      >
+        <img src="../img/github_120px_light.png" id="footerGithubLogo" />
+        <span class="text-decoration-none"> sadeshmukh</span>
+      </a>
+      <span> - Made by Sahil</span>
+    </footer>
+  </body>
+</html>
