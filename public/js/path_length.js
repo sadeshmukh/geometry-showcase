@@ -629,7 +629,7 @@ function calculatePathLength(path) {
         pathLength += width + pathHeight;
         break;
       case "semicircle":
-        pathLength += Math.PI * Math.sqrt(width ** 2 + pathHeight ** 2);
+        pathLength += (Math.PI * Math.sqrt(width ** 2 + pathHeight ** 2)) / 2;
         break;
       default:
         console.error("Impossible case");
