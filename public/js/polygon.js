@@ -17,16 +17,6 @@ const maxSideLength = 1000;
 const minSideLength = 50;
 const sideLengthIncrement = 10;
 
-const sizeInput = document.getElementById("sizeInput");
-let circumscribedRadius = 150;
-const maxRadius = 500;
-const minRadius = 30;
-const radiusIncrement = 5;
-sizeInput.value = circumscribedRadius;
-sizeInput.max = maxRadius;
-sizeInput.min = minRadius;
-sizeInput.step = radiusIncrement;
-
 // Of inscribed radius
 const dotWidth = 1 / 8;
 const minDotWidth = 10;
@@ -85,6 +75,16 @@ const smoothColors = [
   [13, 110, 253],
   [106, 16, 142],
 ];
+
+const sizeInput = document.getElementById("sizeInput");
+let circumscribedRadius = initialHeight / 7;
+const maxRadius = 3 * circumscribedRadius;
+const minRadius = circumscribedRadius / 5;
+const radiusIncrement = 5;
+sizeInput.value = circumscribedRadius;
+sizeInput.max = maxRadius;
+sizeInput.min = minRadius;
+sizeInput.step = radiusIncrement;
 
 function sizeChange({ value }) {
   circumscribedRadius = parseInt(value);
