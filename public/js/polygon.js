@@ -79,9 +79,11 @@ const regularPolygonNames = {
 
 const sizeInput = document.getElementById("sizeInput");
 let circumscribedRadius = initialHeight / 7;
-const maxRadius = 3 * circumscribedRadius;
 const minRadius = circumscribedRadius / 5;
-const radiusIncrement = 5;
+const radiusIncrement = minRadius / 2;
+const maxRadius =
+  Math.floor((3 * circumscribedRadius) / radiusIncrement) * radiusIncrement;
+
 sizeInput.value = circumscribedRadius;
 sizeInput.max = maxRadius;
 sizeInput.min = minRadius;

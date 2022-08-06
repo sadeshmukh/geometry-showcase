@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const howPages = ["path_length", "pythagorean", "polygon"];
+const howPages = ["path_length", "polygon"];
 
 app.use(express.static("public"));
 
